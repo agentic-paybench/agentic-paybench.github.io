@@ -1,0 +1,3 @@
+node_modules/
+.lighthouseci/
+family-gates-report.json

@@ -1,4 +1,4 @@
-# vendored from agentic-paybench/design-system-private@0ceef1d (packages/tokens, packages/family, packages/posture) by packages/family/vendor.mjs; do not edit here, re-vendor
+# vendored from agentic-paybench/design-system-private@d7550af (packages/tokens, packages/family, packages/posture) by packages/family/vendor.mjs; do not edit here, re-vendor
 """family.py: the shared page renderer of the public page family.
 
 One file, Python 3.11 or later, standard library only. It wraps a content file
@@ -108,6 +108,7 @@ def md_to_html(text: str) -> tuple[str | None, str, str | None]:
         i = 1
     out: list[str] = []
     title: str | None = None
+    used_ids: dict[str, int] = {}
     n = len(lines)
     while i < n:
         line = lines[i]
@@ -120,7 +121,12 @@ def md_to_html(text: str) -> tuple[str | None, str, str | None]:
             body = m.group(2)
             if level == 1 and title is None:
                 title = re.sub(r"[*`]", "", body)
-            out.append(f'<h{level} id="{slug(body)}">{inline(body)}</h{level}>')
+            # Ids are unique per page: a repeated heading (the results page
+            # repeats "Work class" under each primitive) gets a numeric suffix.
+            base_id = slug(body)
+            used_ids[base_id] = used_ids.get(base_id, 0) + 1
+            hid = base_id if used_ids[base_id] == 1 else f"{base_id}-{used_ids[base_id]}"
+            out.append(f'<h{level} id="{hid}">{inline(body)}</h{level}>')
             i += 1
             continue
         if line.lstrip().startswith("<!--"):
@@ -264,15 +270,24 @@ def render_page(
     body = _insert(body, PLACEHOLDER_MACHINE, machine_panel(machine or [], machine_intro), False)
     head_marker = f"<!-- posture-class: {marker} -->\n" if marker else ""
     extra = (extra_head.strip() + "\n") if extra_head.strip() else ""
+    # The two typefaces are preloaded so the swap happens before first paint
+    # (no layout shift); an empty favicon stops the browser's /favicon.ico
+    # request unless the page's own head names an icon.
+    preload = (
+        f'<link rel="preload" href="{family_prefix}fonts/hanken-grotesk-latin.woff2" as="font" type="font/woff2" crossorigin>\n'
+        f'<link rel="preload" href="{family_prefix}fonts/ibm-plex-mono-400-latin.woff2" as="font" type="font/woff2" crossorigin>\n'
+    )
+    icon = "" if 'rel="icon"' in extra else '<link rel="icon" href="data:,">\n'
     return (
         f"{head_marker}<!doctype html>\n"
         f'<html lang="{lang}">\n<head>\n<meta charset="utf-8">\n'
         '<meta name="viewport" content="width=device-width, initial-scale=1">\n'
         f"<title>{_esc(title)}</title>\n"
         f'<meta name="description" content="{_esc(description).replace(chr(34), "&quot;")}">\n'
+        f"{preload}"
         f'<link rel="stylesheet" href="{family_prefix}tokens.css">\n'
         f'<link rel="stylesheet" href="{family_prefix}family.css">\n'
-        f"{extra}</head>\n<body>\n"
+        f"{icon}{extra}</head>\n<body>\n"
         '<div class="family-page">\n'
         f"{family_bar(surface)}\n<main>\n{body}\n</main>\n{footer_line()}\n</div>\n</body>\n</html>\n"
     )
