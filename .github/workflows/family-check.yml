@@ -1,0 +1,20 @@
+name: family-check
+
+# The served page index.html is rendered from README.md by the vendored family
+# layout (family/family.py). This check fails when README.md changed and the
+# page was not re-rendered, so the two can never drift apart.
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  render-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: index.html matches a fresh render of README.md
+        run: python3 -I family/family.py render --content README.md --out index.html --surface index --posture measurement --family family/ --check
