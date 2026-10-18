@@ -1,6 +1,6 @@
 # agentic-paybench
 
-> **Start here.** Everyday AI Ltd, a UK research company, measures the payment rails that software agents use to pay each other. One method, frozen and anchored before any result was published, is applied identically to every rail; no rail is recommended and no ordering is published. This index links what exists: the method and its harness, the signed capability records for six rails, the first published measurement, and the three public pre-registrations.
+> **Start here.** Everyday AI Ltd, a UK research company, measures the payment rails that software agents use to pay each other. Each method, frozen and anchored before any of its results was published, is applied identically to every rail; no rail is recommended and no ordering is published. This index links what exists: the method and its harness, the signed capability records for six rails, the first published measurement, and the three public pre-registrations.
 
 Research artefacts for **measuring agent-to-agent payment rails**: a pre-registered evaluation methodology and a capability oracle. Rail-neutral by design: the method is designed for pairwise comparison, the published measurement asserts no merit ordering of named rails, and the work holds no commercial relationship with any rail it measures.
 
