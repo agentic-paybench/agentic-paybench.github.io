@@ -22,7 +22,7 @@ jobs:
         with:
           node-version: '22'
       - name: index.html matches a fresh render of README.md
-        run: python3 -I family/family.py render --content README.md --out index.html --surface index --posture measurement --family family/ --check
+        run: python3 -I family/family.py render --content README.md --out index.html --surface index --posture measurement --family family/ --lead-first --check
       - name: Install the gate tools (pinned)
         run: |
           cd family-gates && npm ci --no-audit --no-fund
